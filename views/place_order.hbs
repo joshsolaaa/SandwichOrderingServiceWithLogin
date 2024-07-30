@@ -1,0 +1,146 @@
+
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Place New Order</title>
+		<meta name="description" content="form to add new books">
+		<meta name="author" content="Mark Tyers">
+		<meta name="viewport" content= "width=device-width, initial-scale=1.0">
+		<link href="/style.css" type="text/css" rel="stylesheet" />
+		<script>
+			let selectedSandwich = null; 
+			let selectedDrink = null; 
+			let selectedSnack = null; 
+			
+			function selectSandwich(name, price, id, image) { 
+				document.getElementById('sandwiches').style.display = 'none'
+				document.getElementById('drinks').style.display = 'block'
+				selectedSandwich = {name, price, id, image}; 
+			}
+			function selectDrink(name, price, id, image) { 
+				document.getElementById('drinks').style.display = 'none'
+				document.getElementById('snacks').style.display = 'block'
+				selectedDrink = {name, price, id, image}; 
+			}
+			function selectSnack(name, price, id, image) { 
+				document.getElementById('snacks').style.display = 'none'
+				document.getElementById('summary').style.display = 'block'
+				selectedSnack = {name, price, id, image}; 
+				document.getElementById('selected_sand_name').innerHTML = selectedSandwich.name
+				document.getElementById('selected_sand_price').innerHTML = selectedSandwich.price
+				document.getElementById('selected_sand_img').src = selectedSandwich.image
+				document.getElementById('selected_drink_name').innerHTML = selectedDrink.name
+				document.getElementById('selected_drink_price').innerHTML = selectedDrink.price
+				document.getElementById('selected_drink_img').src = selectedDrink.image
+				document.getElementById('selected_snack_name').innerHTML = selectedSnack.name
+				document.getElementById('selected_snack_price').innerHTML = selectedSnack.price
+				document.getElementById('selected_snack_img').src = selectedSnack.image
+				const total = selectedSnack.price + selectedDrink.price + selectedSandwich.price
+				document.getElementById('total_due').innerHTML = total
+			}
+			function showForm() { 
+				document.getElementById('name_form').style.display = 'block'
+			}
+			function submitOrder() { 
+				 try {
+			fetch('/submitOrder', {
+				method: 'POST',
+				body: JSON.stringify({ sandwichId: selectedSandwich.id, snackId: selectedSnack.id, drinkId: selectedDrink.id, userId: document.getElementById('user_id').innerHTML, userName: document.getElementById('name').value, userAddress: document.getElementById('address').value})
+			})
+			.then(response => response.text())
+			.then(result => {
+				const {orderid} = JSON.parse(result);
+				document.getElementById('order_id').style.display="block"
+				document.getElementById('order_id').innerHTML = `ORDER PLACED SUCCESSFULLY! ORDER ID: ${orderid}`
+				document.getElementById('refresh_btn').style.display = 'block'
+				//location.reload()// Display the response from the server
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+			} catch (ex) { 
+				console.log(ex)
+			}}
+			function refreshPage() { 
+				location.reload(); 
+			}
+		</script>
+	</head>
+	<body>
+		<header>
+			<h1>Place New Order</h1>
+		</header>
+	<main>
+		{{#if sandwiches}}
+		<div id="sandwiches">
+			<h2>Select Sandwich</h2>
+			 {{#each sandwiches}}
+				<p>{{name}}</p>
+				<p>{{price}}<p>
+				<img height="300" width="300" style="cursor: pointer;" src="{{image}}" onclick="selectSandwich('{{name}}', {{price}}, {{id}}, '{{image}}')"/>
+			 {{/each}}
+		</div>
+		{{/if}}
+		{{#if drinks}}
+		<div id="drinks" style="display: none;">
+			<h2>Select Drink</h2>
+			 {{#each drinks}}
+				<p>{{name}}</p>
+				<p>{{price}}<p>
+				<img height="300" width="300" style="cursor: pointer;" src="{{image}}"  onclick="selectDrink('{{name}}', {{price}}, {{id}}, '{{image}}')"/>
+			 {{/each}}
+		</div>
+		{{/if}}
+		{{#if drinks}}
+		<div id="snacks" style="display: none;">
+			<h2>Select Snack</h2>
+			 {{#each snacks}}
+				<p>{{name}}</p>
+				<p>{{price}}<p>
+				<img height="300" width="300" style="cursor: pointer;" src="{{image}}"  onclick="selectSnack('{{name}}', {{price}}, {{id}},  '{{image}}')"/>
+			 {{/each}}
+		</div>
+		{{/if}}
+		<div id ="summary" style="display: none;">
+			<h3>Order Summary</h3>
+			<p>Selected Sandwich:</p>
+			<p id="selected_sand_name"></p>
+			<p id="selected_sand_price"><p>
+			<img id="selected_sand_img" height="300" width="300" style="cursor: pointer;" src=""/>
+			<p>Selected Drink:</p>
+			<p id="selected_drink_name"></p>
+			<p id="selected_drink_price"><p>
+			<img id="selected_drink_img" height="300" width="300" style="cursor: pointer;" src=""/>
+			<p>Selected Snack:</p>
+			<p id="selected_snack_name"></p>
+			<p id="selected_snack_price"><p>
+			<img id="selected_snack_img" height="300" width="300" style="cursor: pointer;" src=""/>
+			<p>TOTAL:</p>
+			<p id ="total_due"/>
+			<div onclick="showForm()" style="background: #f1f1f1; padding: 10px;width: 120px; margin: 10px;"><p type="button" >PLACE ORDER</p></div>
+			<form id="name_form" style="display: none;">
+				<p id="user_id" style="display:none;">{{userId}}</p>
+			<p>
+				<label for="name">Name</label><br />
+				<input type="text" id="name" placeholder="your name" value="{{name}}" autofocus>
+			</p>
+			<p>
+				<label for="address">Address</label><br />
+				<input type="address" id="address" placeholder="your address" value="{{address}}">
+			</p>
+			<p><input type="button" value="Submit" onclick="submitOrder()"></p>
+			<p id="refresh_btn" style="display: none;"><input type="button" value="Place Another Order" onclick="refreshPage()"></p>
+			<p style="display:none;" id="order_id"></p>
+		</form>
+		</div>
+	{{#if authorised}}
+				<a href="/logout">Log out</a>
+			{{else}}
+				<a href="/login">Log in</a>
+			{{/if}}
+			</footer>
+	</main>
+	</body>
+</html>

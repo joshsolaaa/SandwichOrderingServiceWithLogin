@@ -1,0 +1,102 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Form Submit</title>
+  <meta name="description" content="Detecting the form being submitted">
+  <meta name="author" content="Mark Tyers">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/style.css" type="text/css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="submit.css">
+  {{!-- <script type="module" src="submit.js"></script> --}}
+  <script>
+	  function updateSliderValue() { 
+		  console.log('calling fdunction')
+
+
+		  document.getElementById('amount_val').innerHTML = document.getElementById('amount_slider').value
+	  }
+
+	  function handleSubmit() { 
+		  try {
+ 		 	const name = document.getElementById('name').value
+		  	const description = document.getElementById('description').value
+		  	const price = document.getElementById('amount_slider').value
+		  	const category = document.getElementById('category').value
+
+			const fileInput = document.getElementById('myImage'			);
+			const file = fileInput.files[0];
+
+			const formData = new FormData();
+			formData.append('image', file);
+			formData.append('name', name); 
+			formData.append('description', description); 
+			formData.append('price', price); 
+			formData.append('category', category); 
+
+			fetch('/submitProduct', {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.text())
+			.then(result => {
+				console.log(result);
+				location.replace("/")  // Display the response from the server  // Display the response from the server
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		  	console.log("values are", name, description, price, category)
+		  } catch (ex) { 
+			  console.log(ex)
+		  }
+	  }
+
+  </script>
+</head>
+
+<body>
+  <h1>Add Product</h1>
+	<form>
+		<ol>
+			<li>
+				<label for="name">Name</label>
+				<input id="name" type="text" name="name" />
+			</li>
+			<li>
+				<label for="category">Choose From</label>
+				<select id="category" name="category">
+					<option value="">--- CHOOSE ---</option>
+					<option value="sandwich">Sandwhich</option>
+					<option value="snack">Snack</option>
+					<option value="drink">Drink</option>
+				</select>
+			</li>
+			<li>
+				<label for="amount">Amount</label>
+				<input id="amount_slider" type="range" name="amount" value="50" min="50" max="500" oninput="updateSliderValue()" />
+				<output id="amount_val" name="amount_val">50</output>
+			</li>
+			<li>
+				<label for="total">Description</label>
+				<textarea id="description" name="summary" maxlength="100"></textarea><br />
+				<output name="chars">0</output>
+			</li>
+			<body>
+  <h1>Images</h1>
+	<input type="file" id="myImage" accept="image/*"   /> 
+	<label for="myImage">Choose your file</label>
+	<br/>
+	<section></section>
+</body>
+			<li>
+				<input type="button" value="submit" onclick="handleSubmit()" />
+			</li>
+		</ol>	
+
+	</form>
+</body>
+</html>

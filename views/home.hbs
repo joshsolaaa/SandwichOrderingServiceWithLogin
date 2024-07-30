@@ -1,0 +1,105 @@
+
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Home Page</title>
+		<meta name="description" content="form to add new books">
+		<meta name="author" content="Mark Tyers">
+		<meta name="viewport" content= "width=device-width, initial-scale=1.0">
+		<link href="/style.css" type="text/css" rel="stylesheet" />
+		  <script>
+	  function removeProduct(id) { 
+		  console.log("id is", id)
+		  try {
+			fetch('/removeProduct', {
+				method: 'POST',
+				body: JSON.stringify({ id : id})
+			})
+			.then(response => response.text())
+			.then(result => {
+				console.log(result);
+				location.reload()// Display the response from the server
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		  } catch (ex) { 
+			  console.log(ex)
+		  }
+	  }
+ function completeOrders(id) { 
+		  console.log("id is", id)
+		  try {
+			fetch('/completeOrders', {
+				method: 'POST',
+				body: JSON.stringify({ id : id})
+			})
+			.then(response => response.text())
+			.then(result => {
+				console.log(result);
+				location.reload()// Display the response from the server
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		  } catch (ex) { 
+			  console.log(ex)
+		  }
+	  }
+  </script>
+	</head>
+	<body>
+		<header>
+			<h1>Home</h1>
+		
+		</header>
+	<main>
+		{{#if drinks}}
+			<h2>Drinks</h2>
+			 {{#each drinks}}
+				<p>{{name}}</p>
+				<p>Qty: {{qty}}</p>
+				<button onclick="removeProduct({{id}})">Remove</button>
+				<button onclick="completeOrders({{id}})">Picked</button>
+				<img height="300" width="300" src="{{image}}"/>
+			 {{/each}}
+		{{/if}}
+		{{#if sandwiches}}
+			<h2>Sandwiches</h2>
+			 {{#each sandwiches}}
+				<p>{{name}}</p>
+				<p>Qty: {{qty}}</p>
+				<button onclick="removeProduct({{id}})">Remove</button>
+				<button onclick="completeOrders({{id}})">Picked</button>
+				<img height="300" width="300" src="{{image}}"/>
+			 {{/each}}
+		{{/if}}
+		{{#if snacks}}
+			<h2>Snacks</h2>
+			 {{#each snacks}}
+				<p>{{name}}</p>
+				<p>Qty: {{qty}}</p>
+				<button onclick="removeProduct({{id}})">Remove</button>
+				<button onclick="completeOrders({{id}})">Picked</button>
+				<img height="300" width="300" src="{{image}}"/>
+			 {{/each}}
+		{{/if}}
+		<footer>
+			{{#if authorised}}
+				<a href="/logout">Log out</a>
+				{{#if isOwner}}
+					<a href="/foo">Add Product</a>
+				{{else}}
+					<p>No order placed</p>
+					<button style="font-size:30px;"><a href="placeOrder">Place Order</a></button>
+				{{/if}}
+			{{else}}	
+				<p>This is the home page. Please Login to continue.</p>
+				<a href="/login">Log in</a>
+			{{/if}}
+		</footer>
+	</main>
+	</body>
+</html>
